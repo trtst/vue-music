@@ -1,23 +1,39 @@
 <template>
     <div class="recommend">
-        <div ref="scroll" class="recommend-content">
-            <div v-if="recommends.length" class="slider-wrapper">
-                <slider>
-                    <div v-for="(item, index) in recommends" :key="index">
-                        <a :href="item.linkUrl">
-                            <img class="needsclick" :src="item.picUrl">
-                        </a>
-                    </div>
-                </slider>
+        <my-scroll ref="scroll" :data="discList" class="recommend-content">
+            <div>
+                <div v-if="recommends.length" class="slider-wrapper">
+                    <slider>
+                        <div v-for="(item, index) in recommends" :key="index">
+                            <a :href="item.linkUrl">
+                                <img class="needsclick" :src="item.picUrl">
+                            </a>
+                        </div>
+                    </slider>
+                </div>
+                <div class="recommend-list">
+                    <h1 class="list-title">热门歌单推荐</h1>
+                    <ul>
+                        <li v-for="item in discList" :key="item.dissid" @click="selectItem(item)" class="item">
+                            <div class="icon">
+                              <img :src="item.imgurl" width="60" height="60">
+                            </div>
+                            <div class="text">
+                              <p v-html="item.creator.name" class="name"></p>
+                              <p v-html="item.dissname" class="desc"></p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div class="recommend-list"><h1 class="list-title">热门歌单推荐</h1></div>
-        </div>
+        </my-scroll>
     </div>
 </template>
 
 <script>
     import Slider from '@/base/slider'
-    import {getRecommend} from 'api/recom'
+    import MyScroll from '@/base/scroll'
+    import {getRecommend, getDiscList} from 'api/recom'
     import {ERR_OK} from 'api/config'
     export default {
         data () {
@@ -28,8 +44,15 @@
         },
         created () {
             this._getRecommend()
+            this._getDiscList()
         },
         methods: {
+            // 子路由跳转
+            selectItem (item) {
+                this.$router.push({
+                    path: `/recommend/${item.dissid}`
+                })
+            },
             _getRecommend () {
                 getRecommend().then((res) => {
                     if (res.code === ERR_OK) {
@@ -37,11 +60,17 @@
                     }
                 })
             },
-            loadImg () {
+            _getDiscList () {
+                getDiscList().then((res) => {
+                    if (res.code === ERR_OK) {
+                        this.discList = res.data.list
+                    }
+                })
             }
         },
         components: {
-            Slider
+            Slider,
+            MyScroll
         }
     }
 </script>

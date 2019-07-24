@@ -109,6 +109,9 @@
                     this.slider.refresh()
                 })
             }, 20)
+        },
+        destroyed () {
+            clearTimeout(this.timer)
         }
     }
 </script>

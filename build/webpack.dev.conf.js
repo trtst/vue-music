@@ -4,6 +4,7 @@ const webpack = require('webpack')
 const config = require('../config')
 const merge = require('webpack-merge')
 const path = require('path')
+const express = require('express')
 const baseWebpackConfig = require('./webpack.base.conf')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
@@ -12,6 +13,10 @@ const portfinder = require('portfinder')
 
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
+
+// axios 结合 node.js 代理后端请求
+const apiRoute = express.Router()
+const axios = require('axios')
 
 const devWebpackConfig = merge(baseWebpackConfig, {
   module: {
@@ -42,6 +47,25 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     quiet: true, // necessary for FriendlyErrorsPlugin
     watchOptions: {
       poll: config.dev.poll,
+    },
+    before(apiRoute) {
+        apiRoute.get('/getList', function (req, res) {
+          var url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'
+
+          axios.get(url, {
+              headers: {
+                referer: 'https://c.y.qq.com/',
+                host: 'c.y.qq.com'
+              },
+              params: req.query
+            })
+            .then(function (response) {
+              res.json(response.data)
+            })
+            .catch(function (error) {
+              console.log(error)
+            })
+        })
     }
   },
   plugins: [
