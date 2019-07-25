@@ -10,7 +10,7 @@
         name: 'scroll',
         props: {
             data: {
-                type: Array,
+                type: Array | Object,
                 default: null
             },
             probeType: {
@@ -64,6 +64,15 @@
                     probeType: this.probeType,
                     click: this.click
                 })
+
+                // 派发监听滚动位置事件
+                if (this.listenScroll) {
+                    let me = this
+                    this.scroll.on('scroll', (pos) => {
+                        // 向父组件传值
+                        me.$emit('scroll', pos)
+                    })
+                }
             },
             enable () {
                 this.scroll && this.scroll.enable()
@@ -73,6 +82,12 @@
             },
             refresh () {
                 this.scroll && this.scroll.refresh()
+            },
+            scrollTo () {
+                this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
+            },
+            scrollToElement () {
+                this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
             }
         }
     }

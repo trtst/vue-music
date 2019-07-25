@@ -16,7 +16,7 @@
                     <ul>
                         <li v-for="item in discList" :key="item.dissid" @click="selectItem(item)" class="item">
                             <div class="icon">
-                              <img :src="item.imgurl" width="60" height="60">
+                              <img v-lazy="item.imgurl" width="60" height="60">
                             </div>
                             <div class="text">
                               <p v-html="item.creator.name" class="name"></p>
